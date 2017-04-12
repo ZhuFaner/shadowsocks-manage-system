@@ -1,13 +1,13 @@
 # 基于Laravel的翻墙管理系统
 ### 简介
+
 #### 翻墙管理系统 **shadowsocks-manage-system** 是一个基于Laravel5的一个vpn用户管理系统，使用Swoole框架与SSServer通信，实现添加用户、编辑用户、统计每天、每周、每月以及总的流量使用情况，还可以根据用户的流量使用情况进行排名，直观地反应出每个用户的流量使用。  
 ### 展示
--
 ![rank image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/rank.png)  
 
 ![detail image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/detail.png)  
 ### 使用  
--
+
 #### 1. 在你的网站目录下，执行git clone  https://github.com/ZhuFaner/shadowsocks-manage-system.git，更改storage和bootstrap的权限为777
 #### 2. 在.env中配置你的数据库连接
     DB_CONNECTION = mysql  
