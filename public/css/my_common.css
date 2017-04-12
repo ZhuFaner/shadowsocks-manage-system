@@ -1,0 +1,50 @@
+.mt_10 {
+    margin-top: 10px;
+}
+
+.form-top {
+    overflow: hidden;
+    margin-top: 120px;
+    background: rgba(0, 0, 0, 0.2);
+    color: #F8F8F8;
+    text-align: center;
+    padding: 15px 25px 25px 15px;
+    border-top-right-radius: 15px;
+    border-top-left-radius: 15px;
+}
+.form-bottom {
+    padding: 35px 25px 30px 25px;
+    background: #444;
+    background: rgba(0,0,0,0.4);
+    text-align: left;
+    color: #F8F8F8;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+.padding_10{
+    padding: 10px;
+}
+
+.header{
+    font-size: 30px;
+}
+.btn_submit{
+    background: #eaeaea;
+}
+.content_title {
+    margin-left: 30px;
+}
+.li_server{
+    list-style-type:none;
+}
+.li_user{
+    margin-top: 10px;
+}
+.list_item{
+    color: black;
+}
+.btn_common{
+    color: black;
+    background: #eaeaea;
+    margin-top: 10px;
+}

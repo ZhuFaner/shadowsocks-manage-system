@@ -1,0 +1,8 @@
+{
+  "service_port": 6001,
+  "address":"127.0.0.1",
+  "dsn":"mysql:host=localhost;dbname=shadow_manage",
+  "db_user": "root",
+  "db_password": "",
+  "interval_time": 5000
+}
