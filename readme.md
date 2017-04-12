@@ -8,7 +8,7 @@
 ![detail image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/detail.png)  
 ### 使用  
 
-#### 1. 在你的网站目录下，执行git clone [https://github.com/ZhuFaner/shadowsocks-manage-system.git](]https://github.com/ZhuFaner/shadowsocks-manage-system.git)，更改storage和bootstrap的权限为777
+#### 1. 在你的网站目录下，执行git clone [https://github.com/ZhuFaner/shadowsocks-manage-system.git](]https://github.com/ZhuFaner/shadowsocks-manage-system.git) ,更改storage和bootstrap的权限为777
 #### 2. 在.env中配置你的数据库连接
     DB_CONNECTION = mysql  
     DB_HOST = 127.0.0.1  
