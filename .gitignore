@@ -3,7 +3,6 @@
 Homestead.yaml
 Homestead.json
 .env
-/readme.md
 resources/.DS_Store
 /.idea/
 
