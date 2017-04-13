@@ -100,7 +100,7 @@ class HomeController extends Controller
     {
         $port = $request->get('port');
         $user = Member::where('port', $port)->first();
-        $temp = 'aes-256-cfb:' . $user->password . '@autolayout.club:' . $user->port;
+        $temp = 'aes-256-cfb:' . $user->password . \Config::get('ss_domain') . $user->port;
         $qr_url = 'ss://' . base64_encode($temp);
         $total = Flow::getTotalFlow($port);
         $day_flow = $this->getThisDayFlow($port);
@@ -112,7 +112,7 @@ class HomeController extends Controller
             'total' => $total,
             'day_flow' => $day_flow,
             'week_flow' => $week_flow,
-            'month_flow' => $month_flow
+            'month_flow' => $month_flow,
         ));
     }
 
