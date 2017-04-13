@@ -11,7 +11,7 @@
                             <div>端&nbsp;&nbsp;&nbsp;口：<label id="label_port">{{ $user->port }}</label></div>
                             <div>密&nbsp;&nbsp;&nbsp;码：<label>{{ $user->password }}</label></div>
                             {{--round($day_flow / 1024, 2) . 'KB'--}}
-                            <div>本&nbsp;&nbsp;&nbsp;日：<label>{{ round($day_flow/1024).'KB' }}</label></div>
+                            <div>本&nbsp;&nbsp;&nbsp;日：<label>{{ round($day_flow/1024).'KB'}}</label></div>
                             <div>本&nbsp;&nbsp;&nbsp;周：<label>{{ round($week_flow/1024).'KB' }}</label></div>
                             <div>本&nbsp;&nbsp;&nbsp;月：<label>{{ round($month_flow/1024).'KB' }}</label></div>
                             <div>总流量：<label>{{ round($total/1024).'KB' }}</label></div>
