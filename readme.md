@@ -61,7 +61,7 @@ php artisan migrate
 在config/app.php中修改ss_domain为自己的服务器域名
 
 ```php
-'ss_domain' => 'your domain name',
+'ss_domain' => 'your domain name'
 ```
 
 ### 二、安装并配置 shadowsocks
