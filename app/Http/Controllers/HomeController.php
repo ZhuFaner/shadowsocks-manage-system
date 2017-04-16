@@ -58,7 +58,7 @@ class HomeController extends Controller
     {
         $num = 0;
         $bgArray = ['#FF6384', '#4BC0C0', '#FFCE56', '#E7E9ED', '#36A2EB', '#8A2BE2', '#FF00FF',
-            '#32CD32', '#6A5ACD', '#4169E1', '#00BFFF', '#FF4500', '	#D2691E', '#696969'];
+            '#32CD32', '#6A5ACD', '#4169E1', '#00BFFF', '#FF4500', '#D2691E', '#696969'];
         $data = [];
         $array = [];
         $labels = [];
@@ -68,9 +68,16 @@ class HomeController extends Controller
             $data[$flowItem->port] = round($flowItem->flow / 1024, 2);
         }
         arsort($data);
-        foreach ($data as $key => $value) {
-            $array[$num] = $value;
-            $labels[$num] = $key;
+        foreach ($data as $port => $flow) {
+            $array[$num] = $flow;
+
+            $member = Member::getMemberByPort($port);
+            if (!is_null($member) && strlen($member->name)>0){
+                $labels[$num] = $member->name;
+            }else{
+                $labels[$num] = '端口：'.$port;
+            }
+
             $bg_colors[$num] = $bgArray[array_rand($bgArray, 1)];
             $num++;
         }
