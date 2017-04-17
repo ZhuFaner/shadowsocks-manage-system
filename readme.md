@@ -16,6 +16,8 @@
 
 ## 原理剖析
 
+![原理 image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/yuanli@2x.jpg)
+
 1. ssserver 即 shadowsocks 的服务进程，以 manager 模式启动，这样就可以通过 udp 协议对其进行管理，可以在其运行过程中动态地添加、更新、删除账号，同时 ssserver 会将流量信息发送给通过 udp 协议控制它的某个进程
 2. Swoole 进程独立运行，每隔 5 秒查询一次数据库，将所有的端口号-密码组合向 ssserver 添加一遍（确实很 dirty，但是没办法）
 3. 网站部分有两个功能：
