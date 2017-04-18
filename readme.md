@@ -164,6 +164,11 @@ php SwooleTask.php
 
 Swoole 进程需要一直存在于内存中，以源源不断地接收来自 ssserver 进程的流量信息，同时承担着每 5 秒一次的账号更新操作。推荐使用 Supervisor 来维护 Swoole 进程，具体可以自行搜索，使用起来还是挺简单的。
 
+
+## 开源协议
+
+本项目遵循 MIT 协议开源，具体请查看根目录下的 LICENSE 文件。
+
 <hr>
 
 > 遇到问题请提交 issue~  
