@@ -47,15 +47,21 @@ sudo chmod -R 777 storage bootstrap/cache
 
 #### 2. 配置数据库
 
-修改 .env 文件：
+复制 .env.example 文件，命名为 .env 文件，修改 .env 中的以下几项配置：
 
 ```php
-DB_CONNECTION = mysql  
-DB_HOST = 127.0.0.1  
-DB_PORT = 3306
-DB_DATABASE = db_name
-DB_USERNAME = name
-DB_PASSWORD = your password  
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_name
+DB_USERNAME=name
+DB_PASSWORD=your password
+```
+
+之后执行命令：
+
+```php
+php artisan key:generate
 ```
 
 #### 3. 进行数据库迁移，将所需的表结构写入数据库
