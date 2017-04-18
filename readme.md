@@ -8,19 +8,21 @@
 - [x] 单独统计每个用户每天、每周、每月的流量值及流量使用趋势
 - [x] 首页以小时、天、周为维度展示流量使用排行，便于找出资源消耗过量的账号
 
-## 截图展示
-
-![rank image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/rank.png)  
-
-![detail image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/detail.png)  
-
 ## 原理剖析
+
+![原理 image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/yuanli@2x.jpg)
 
 1. ssserver 即 shadowsocks 的服务进程，以 manager 模式启动，这样就可以通过 udp 协议对其进行管理，可以在其运行过程中动态地添加、更新、删除账号，同时 ssserver 会将流量信息发送给通过 udp 协议控制它的某个进程
 2. Swoole 进程独立运行，每隔 5 秒查询一次数据库，将所有的端口号-密码组合向 ssserver 添加一遍（确实很 dirty，但是没办法）
 3. 网站部分有两个功能：
     1. 添加账号时，直接将数据写入数据库，等待 Swoole 进程每 5 秒一次的读取
     2. 删除账号时，使用 Swoole 的 udp 客户端的同步阻塞模式（简单独立调用，跟 Swoole 进程无关），给 ssserver 发送删除请求。更改密码采用 删除再新增 实现。
+
+## 截图展示
+
+![rank image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/rank.png)  
+
+![detail image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/detail.png)  
 
 ## 如何使用
 
@@ -164,5 +166,6 @@ Swoole 进程需要一直存在于内存中，以源源不断地接收来自 sss
 
 <hr>
 
-> 遇到问题请提交 issue~
+> 遇到问题请提交 issue~  
+> 也可以加入qq群：347339542，一起学习交流~
 
