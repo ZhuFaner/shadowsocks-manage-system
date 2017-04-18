@@ -24,6 +24,10 @@
 
 ![detail image](https://raw.githubusercontent.com/ZhuFaner/shadowsocks-manage-system/master/public/image/detail.png)  
 
+## 环境要求
+
+> ### PHP >= 5.6.4
+
 ## 如何使用
 
 ### 一、部署 web 部分
