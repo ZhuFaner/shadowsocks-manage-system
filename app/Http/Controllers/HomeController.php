@@ -109,10 +109,10 @@ class HomeController extends Controller
         $user = Member::where('port', $port)->first();
         $temp = 'aes-256-cfb:' . $user->password .'@'. \Config::get('app.ss_domain') . ':'. $user->port;
         $qr_url = 'ss://' . base64_encode($temp);
-        $total = Flow::getTotalFlow($port);
-        $day_flow = $this->getThisDayFlow($port);
-        $week_flow = $this->getThisWeekFlow($port);
-        $month_flow = $this->getThisMonthFlow($port);
+        $total = $this->bytesToSize(Flow::getTotalFlow($port));
+        $day_flow = $this->bytesToSize($this->getThisDayFlow($port));
+        $week_flow= $this->bytesToSize($this->getThisWeekFlow($port));
+        $month_flow=$this->bytesToSize($this->getThisMonthFlow($port));
         return view('user_detail', array(
             'user' => $user,
             'qr_url' => $qr_url,
@@ -311,6 +311,37 @@ class HomeController extends Controller
         $result = $client->recv();
         $client->close();
         return $result;
+    }
+
+    private function bytesToSize($bytes, $precision = 2)
+    {
+
+        if($bytes == null) {
+            return '0 B';
+        }
+
+        $kilobyte = 1024;
+        $megabyte = $kilobyte * 1024;
+        $gigabyte = $megabyte * 1024;
+        $terabyte = $gigabyte * 1024;
+
+        if (($bytes >= 0) && ($bytes < $kilobyte)) {
+            return $bytes . ' B';
+
+        } elseif (($bytes >= $kilobyte) && ($bytes < $megabyte)) {
+            return round($bytes / $kilobyte, $precision) . ' KB';
+
+        } elseif (($bytes >= $megabyte) && ($bytes < $gigabyte)) {
+            return round($bytes / $megabyte, $precision) . ' MB';
+
+        } elseif (($bytes >= $gigabyte) && ($bytes < $terabyte)) {
+            return round($bytes / $gigabyte, $precision) . ' GB';
+
+        } elseif ($bytes >= $terabyte) {
+            return round($bytes / $terabyte, $precision) . ' TB';
+        } else {
+            return $bytes . ' B';
+        }
     }
 
 
