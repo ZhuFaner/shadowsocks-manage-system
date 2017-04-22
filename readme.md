@@ -69,11 +69,16 @@ php artisan key:generate
 ```php
 php artisan migrate
 ```
-#### 4. 配置自己的服务器域名
+#### 4. 修改配置文件
 在 `config/app.php` 中修改 ss_domain 为自己的服务器域名
 
 ```php
 'ss_domain' => 'your domain name'
+```
+修改 register_enable开启/关闭管理员账号注册功能
+
+```php
+'register_enable' => true
 ```
 
 ### 二、安装并配置 shadowsocks
