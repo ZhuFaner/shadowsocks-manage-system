@@ -47,7 +47,9 @@
                 <!-- Authentication Links -->
                 @if (Auth::guest())
                     <!-- <li><a href="{{ url('/login') }}">Login</a></li>  -->
+                    @if(\Config::get('app.register_enable'))
                         <li><a href="{{ url('/register') }}">Register</a></li>
+                    @endif
                 @else
                     <li><a href="{{ url('/') }}">首页</a></li>
                     <li><a href="{{ url('/user_manage') }}">用户管理</a></li>
