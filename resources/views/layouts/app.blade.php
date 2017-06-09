@@ -53,6 +53,7 @@
                 @else
                     <li><a href="{{ url('/') }}">首页</a></li>
                     <li><a href="{{ url('/user_manage') }}">用户管理</a></li>
+                    <li><a href="{{ url('/node/list') }}">节点管理</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                             {{ Auth::user()->email }} <span class="caret"></span>

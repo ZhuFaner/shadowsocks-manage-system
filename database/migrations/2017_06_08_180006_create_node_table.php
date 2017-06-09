@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFlowTable extends Migration
+class CreateNodeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,13 +12,11 @@ class CreateFlowTable extends Migration
      */
     public function up()
     {
-        Schema::create('flows', function (Blueprint $table) {
+        Schema::create('nodes', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('port');
-            $table->integer('time');
-            $table->timestamp('date_time');
-            $table->bigInteger('flow');
-            $table->string('address');
+            $table->string('node_address');
+            $table->integer('node_port');
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ class CreateFlowTable extends Migration
      */
     public function down()
     {
-        Schema::drop('flows');
+        Schema::drop('nodes');
     }
 }
