@@ -14,7 +14,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['show_rank', 'index']]);
     }
 
     /**
@@ -94,7 +94,7 @@ class HomeController extends Controller
      */
     public function show_member()
     {
-        $userArray = Member::orderBy('id', 'desc')->get();;
+        $userArray = Member::orderBy('id', 'desc')->get();
         return view('user_manage')->with('userArray', $userArray);
     }
 
