@@ -14,7 +14,7 @@ $interval_time = $config->interval_time; //向SSServer添加端口号的间隔�
 $saver = array();
 
 $client = new swoole_client(SWOOLE_SOCK_UDP, SWOOLE_SOCK_ASYNC);
-$client->on("connect", function(swoole_client $cli) use($dsn,$db_user,$db_password) {
+$client->on("connect", function(swoole_client $cli) use($dsn,$db_user,$db_password){
   try {
     $db = new PDO($dsn,$db_user,$db_password);
     $sql = 'select * from members';

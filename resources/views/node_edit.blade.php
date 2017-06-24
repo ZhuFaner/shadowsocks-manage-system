@@ -10,25 +10,25 @@
                         <a id="delete" style="float: right">删除节点</a>
                     </div>
                     <div class="panel-body">
-                        <div class="form-group">
+                        <div class="form-group" style="height: 44px">
                               <label class="col-md-4 control-label">节点名称：</label>
                               <div class="col-md-6">
                                   <input class="form-control" id="name" value="{{$node->name}}" placeholder="节点名称">
                               </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="height: 44px">
                               <label class="col-md-4 control-label">节点地址：</label>
                               <div class="col-md-6">
                                   <input class="form-control" id="address" value="{{$node->node_address}}" placeholder="节点地址">
                               </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="height: 44px">
                               <label class="col-md-4 control-label">端口：</label>
                               <div class="col-md-6">
                                   <input class="form-control" id="port" value="{{$node->node_port}}" placeholder="该节点SSServer的端口">
                               </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="height: 44px">
                               <div class="col-md-6 col-md-offset-4">
                                 <button id="btn1" class="btn btn-primary login-btn">保存</button>
                               </div>

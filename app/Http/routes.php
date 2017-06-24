@@ -25,8 +25,7 @@ Route::post('day_flow','HomeController@day_flow');
 Route::post('week_flow','HomeController@week_flow');
 Route::post('del_user','HomeController@delete_member');
 Route::post('update_user','HomeController@update_member');
-
-// Route::resource('node', 'NodeController');
+Route::post('add','HomeController@add_user');
 
 Route::get('add_user',function (){
     return view('add_user');
@@ -41,9 +40,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'node'], function ()
   Route::post('update/{id}', 'NodeController@update');
   Route::post('delete/{id}', 'NodeController@delete');
 });
-Route::post('add','HomeController@add_user');
 
-Route::group(['middleware' => 'auth', 'namespace' => 'Admin', 'prefix' => 'admin'], function() {
-    Route::get('/', 'HomeController@index');
-});
+// Route::group(['middleware' => 'auth', 'namespace' => 'Admin', 'prefix' => 'admin'], function() {
+//     Route::get('/', 'HomeController@index');
+// });
 

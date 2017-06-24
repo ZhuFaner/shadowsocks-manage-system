@@ -46,7 +46,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <!-- Authentication Links -->
                 @if (Auth::guest())
-                    <!-- <li><a href="{{ url('/login') }}">Login</a></li>  -->
+                    <li><a href="{{ url('/login') }}">Login</a></li> 
                     @if(\Config::get('app.register_enable'))
                         <li><a href="{{ url('/register') }}">Register</a></li>
                     @endif

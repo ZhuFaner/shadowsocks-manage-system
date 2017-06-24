@@ -9,6 +9,11 @@ use App\Node;
 
 class NodeController extends Controller
 {
+
+  function __construct()
+  {
+    $this->middleware('auth');
+  }
     public function index()
     {
       $nodeArray = Node::orderBy('id', 'desc')->get();
