@@ -21,7 +21,7 @@
                                         <div class="list_item">端口：{{ $node->node_port }}</div>
                                         <div>
                                             <button class="btn btn-default btn_common"
-                                                    onclick="location.href='/user_detail?port={{ $node->node_port }}'">
+                                                    onclick="location.href='/node/detail/{{ $node->id }}'">
                                                 节点详情
                                             </button>
                                             <button class="btn btn-default btn_common"

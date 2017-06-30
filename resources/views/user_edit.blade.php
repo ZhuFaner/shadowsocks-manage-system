@@ -76,11 +76,11 @@
                 <div class="panel-heading">用户编辑</div>
                 <div class="panel-body">
                     <div>
-                        <label>端&nbsp &nbsp口</label>
+                        <label>端&nbsp; &nbsp;口</label>
                         <input id="user_port" disabled="true" value="{{ $port }}">
                     </div>
                     <div>
-                        <label>密&nbsp &nbsp码</label>
+                        <label>密&nbsp; &nbsp;码</label>
                         <input id="user_pass" value="{{ $password }}">
                     </div>
                     <div>

@@ -4,41 +4,69 @@
         <div class="row"> 
             <div class="col-md-10 col-md-offset-1">
                 <div class="panel panel-default">
-                    <div class="panel-heading">用户详情</div>
-                    <div class="panel-body">
+                    <div class="panel-heading col-md-12">用户详情</div>
+                    <div class="panel-body" style="margin-top: 20px;">
                         <div>
-                            <div>用户名：<label>{{ $user->name }}</label></div>
-                            <div>端&nbsp;&nbsp;&nbsp;口：<label id="label_port">{{ $user->port }}</label></div>
-                            <div>密&nbsp;&nbsp;&nbsp;码：<label>{{ $user->password }}</label></div>
-                            {{--round($day_flow / 1024, 2) . 'KB'--}}
-                            <div>本&nbsp;&nbsp;&nbsp;日：<label>{{ $day_flow }}</label></div>
-                            <div>本&nbsp;&nbsp;&nbsp;周：<label>{{ $week_flow }}</label></div>
-                            <div>本&nbsp;&nbsp;&nbsp;月：<label>{{ $month_flow }}</label></div>
-                            <div>总流量：<label>{{ $total }}</label></div>
-                            <div>
-                                <qr-code data="{{ $qr_url }}"></qr-code>
+                            <div style="margin-top: 32px; font-size: 16px;">
+                                <span class="col-md-4">用户名：<label>{{ empty($user->name) ? "无" : $user->name }}</label></span>
+                                <span class="col-md-4">端口：<label id="label_port">{{ $user->port }}</label></span>
+                                <span class="col-md-4">密码：<label>{{ $user->password }}</label></span>
                             </div>
+                            <div style="height: 48px;">&nbsp;</div>
+                            
+                            @foreach ($node_data as $data)
+                                <div class="col-md-4">
+                                    <div>服务器：<label>{{ $data["node_name"] }}</label></div>
+                                    <div>本&nbsp;&nbsp;&nbsp;日：<label>{{ $data["day_flow"] }}</label></div>
+                                    <div>本&nbsp;&nbsp;&nbsp;周：<label>{{ $data["week_flow"] }}</label></div>
+                                    <div>本&nbsp;&nbsp;&nbsp;月：<label>{{ $data["month_flow"] }}</label></div>
+                                    <div>总流量：<label>{{ $data["total"] }}</label></div>    
+                                    <div>
+                                        <qr-code data="{{ $data['qr_url'] }}"></qr-code>
+                                    </div>
+                                </div>
+                            @endforeach
+                            
                             <br>
-                            <div>流量统计：</div>
-                            <hr>
-                            <div style="width: 100%; max-width: 800px;">
-                                <div>统计周期：
-                                    <button id="btn_by_hour">按小时</button>
-                                    <button id="btn_by_day">按天</button>
-                                    <button id="btn_by_week">按周</button>
-                                </div>
-                                <div id="time_period" class="period_style"></div>
-                                <div id="chart_parent">
-                                    <canvas id="myChart" class="chart" width="500" height="250"></canvas>
-                                </div>
-                                <div>
-                                    <button id="pre" style="padding-left: 20px;padding-right: 20px">前一天</button>
-                                    <button id="next" style="padding-left: 20px;padding-right: 20px">后一天</button>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="panel panel-default">
+                    <div class="panel-heading col-md-12">
+                        <span style="height: 34px; line-height: 34px;">流量统计：</span>
+                        <select id="node_selector" class="form-control pull-right" style="display: inline-block; width: 250px;">
+                            @foreach($nodes as $node)
+                                <option address="{{$node->node_address}}">
+                                {{ $node->name ? $node->name : $node->node_address}}
+                                </option>
+                            @endforeach
+                        </select>
+                        <span class="pull-right" style="height: 34px; line-height: 34px;">节点：</span>    
+                    </div>
+                    <div class="panel-body" style="margin-top: 20px;">
+                        <hr>
+                        <div style="width: 100%; max-width: 800px;">
+                            <div>统计周期：
+                                <button id="btn_by_hour">按小时</button>
+                                <button id="btn_by_day">按天</button>
+                                <button id="btn_by_week">按周</button>
+                            </div>
+                            <div id="time_period" class="period_style"></div>
+                            <div id="chart_parent">
+                                <canvas id="myChart" class="chart" width="500" height="250"></canvas>
+                            </div>
+                            <div>
+                                <button id="pre" style="padding-left: 20px;padding-right: 20px">前一天</button>
+                                <button id="next" style="padding-left: 20px;padding-right: 20px">后一天</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>        
             </div>
         </div>
     </div>
@@ -48,6 +76,8 @@
             var day = 0;
             var week = 0;
             var type = 1;
+            var node = $('#node_selector').find("option:selected").attr("address");
+
             var port = $("#label_port").text();
             $.ajaxSetup({
                 headers: {
@@ -105,12 +135,27 @@
                         break;
                 }
             });
+            $("#node_selector").change(function () {
+                node = $('#node_selector').find("option:selected").attr("address");
+                switch (type) {
+                    case 0:
+                        getHourFlow(hour);
+                        break;
+                    case 1:
+                        getDayFlow(day);
+                        break;
+                    case 2:
+                        getWeekFlow(week);
+                        break;
+                }
+            });
 
             function getHourFlow(hour) {
                 $.post("hour_flow",
                         {
                             port: port,
-                            hour: hour
+                            hour: hour,
+                            node: node
                         },
                         function (data) {
                             var json = JSON.parse(data);
@@ -124,7 +169,8 @@
                 $.post("day_flow",
                         {
                             port: port,
-                            day: day
+                            day: day,
+                            node: node
                         },
                         function (data) {
                             var json = JSON.parse(data);
@@ -138,7 +184,8 @@
                 $.post("week_flow",
                         {
                             port: port,
-                            week: week
+                            week: week,
+                            node: node
                         },
                         function (data) {
                             var json = JSON.parse(data);

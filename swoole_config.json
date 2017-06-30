@@ -1,8 +1,6 @@
 {
-  "service_port": 6001,
-  "address":"127.0.0.1",
-  "dsn":"mysql:host=localhost;dbname=shadow_manage",
+  "dsn":"mysql:host=localhost;dbname=ss_manage",
   "db_user": "root",
-  "db_password": "",
+  "db_password": "192837465",
   "interval_time": 5000
 }

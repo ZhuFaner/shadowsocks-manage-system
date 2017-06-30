@@ -34,6 +34,7 @@ Route::get('add_user',function (){
 Route::group(['middleware' => 'auth', 'prefix' => 'node'], function ()
 {
   Route::get('list', 'NodeController@index');
+  Route::get('detail/{id}', 'NodeController@detail');
   Route::get('create', 'NodeController@create');
   Route::post('store', 'NodeController@store');
   Route::get('edit/{id}', 'NodeController@edit');

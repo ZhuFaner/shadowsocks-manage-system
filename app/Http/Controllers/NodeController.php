@@ -16,8 +16,13 @@ class NodeController extends Controller
   }
     public function index()
     {
-      $nodeArray = Node::orderBy('id', 'desc')->get();
+      $nodeArray = Node::allNodes(true);
       return view('node_manage')->with('nodeArray', $nodeArray);
+    }
+
+    public function detail($id)
+    {
+      return view('node_detail')->with('node', Node::find($id));
     }
 
     public function create()
@@ -33,12 +38,22 @@ class NodeController extends Controller
       $node_name = $request->get('name');
       $node_address = $request->get('address');
       $node_port = $request->get('port');
-      if (empty(Node::Where('node_address', $node_address)->first())) {
-        $array['msg'] = '添加成功';
-        Node::create(['name' => $node_name,'node_address' => $node_address,'node_port' => $node_port]);
+      $exist_node = Node::Where('node_address', $node_address)->first(); 
+      if ($exist_node) {
+        if ($exist_node->valid) {
+          $array['msg'] = '请勿添加相同节点';
+          $array['code'] = 1;
+        }else{
+          $exist_node->name = $node_name;
+          $exist_node->node_address = $node_address;
+          $exist_node->node_port = $node_port;
+          $exist_node->valid = true;
+          $exist_node->save();
+          $array['msg'] = '添加成功';  
+        }
       }else{
-        $array['msg'] = '请勿添加相同节点';
-        $array['code'] = 1;
+        $array['msg'] = '添加成功';
+        Node::create(['name' => $node_name,'node_address' => $node_address,'node_port' => $node_port, 'valid' => 1]);
       }
       return $array;
     }
@@ -54,7 +69,7 @@ class NodeController extends Controller
       $array = array(
             'code' => 0,
             'msg' => '保存成功');
-      if (Node::where('node_address', $request->get('address'))->where('id','!=',$id)->first()) {
+      if (Node::where('node_address', $request->get('address'))->where('id','!=',$id)->where('valid', 1)->first()) {
         $array = array(
             'code' => 1,
             'msg' => '请勿添加相同节点');
@@ -70,7 +85,9 @@ class NodeController extends Controller
 
     public function delete($id)
     {
-      Node::destroy($id);
+      $node = Node::find($id);
+      $node->valid = 0;
+      $node->save();
       $array = array(
             'code' => 0,
             'msg' => '删除成功');

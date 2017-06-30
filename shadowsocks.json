@@ -1,7 +1,7 @@
 {
     "server": "0.0.0.0",
     "port_password": {
-        "port": "password"
+        "28989": "192837465"
     },
     "timeout": 300,
     "method": "aes-256-cfb"

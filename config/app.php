@@ -6,7 +6,7 @@ return [
     * your domain name
     */
 
-    'ss_domain' => 'your domain name',
+    // 'ss_domain' => '',
 
     /*
      * 是否开启管理员注册功能

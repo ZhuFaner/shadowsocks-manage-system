@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Flow;
 use App\Member;
 use Illuminate\Http\Request;
+use App\Node;
 
 class HomeController extends Controller
 {
@@ -34,6 +34,7 @@ class HomeController extends Controller
     public function show_rank(Request $request)
     {
         $type = $request->get('type');
+        $node = $request->get('node');
         if ($type == 'hour') {
             $startTime = date('Y-m-d H:i:s', time() - 3600);
             $endTime = date('Y-m-d H:i:s', time());
@@ -44,7 +45,7 @@ class HomeController extends Controller
             $startTime = date('Y-m-d H:i:s', time() - 604800);
             $endTime = date('Y-m-d H:i:s', time());
         }
-        return json_encode($this->getRankFlows($startTime, $endTime));
+        return json_encode($this->getRankFlows($startTime, $endTime, $node));
 //        return parent::appResponse($this->getRankFlows($startTime,$endTime));
     }
 
@@ -54,7 +55,7 @@ class HomeController extends Controller
      * @param $endTime
      * @return array
      */
-    private function getRankFlows($startTime, $endTime)
+    private function getRankFlows($startTime, $endTime, $node)
     {
         $num = 0;
         $bgArray = ['#FF6384', '#4BC0C0', '#FFCE56', '#E7E9ED', '#36A2EB', '#8A2BE2', '#FF00FF',
@@ -63,7 +64,7 @@ class HomeController extends Controller
         $array = [];
         $labels = [];
         $bg_colors = [];
-        $testFlow = Flow::getAllFlowRank($startTime, $endTime);
+        $testFlow = Flow::getAllFlowRank($startTime, $endTime, $node);
         foreach ($testFlow as $flowItem) {
             $data[$flowItem->port] = round($flowItem->flow / 1024, 2);
         }
@@ -107,31 +108,39 @@ class HomeController extends Controller
     {
         $port = $request->get('port');
         $user = Member::where('port', $port)->first();
-        $temp = 'aes-256-cfb:' . $user->password .'@'. \Config::get('app.ss_domain') . ':'. $user->port;
-        $qr_url = 'ss://' . base64_encode($temp);
-        $total = $this->bytesToSize(Flow::getTotalFlow($port));
-        $day_flow = $this->bytesToSize($this->getThisDayFlow($port));
-        $week_flow= $this->bytesToSize($this->getThisWeekFlow($port));
-        $month_flow=$this->bytesToSize($this->getThisMonthFlow($port));
+        $nodes = Node::allNodes(false);
+        $array = [];
+        foreach ($nodes as $node) {
+            $temp = 'aes-256-cfb:' . $user->password .'@'. $node->node_address . ':'. $user->port;
+            $qr_url = 'ss://' . base64_encode($temp);
+            $total = $this->bytesToSize(Flow::getTotalFlow($port,$node->node_address));
+            $day_flow = $this->bytesToSize($this->getThisDayFlow($port, $node->node_address));
+            $week_flow = $this->bytesToSize($this->getThisWeekFlow($port, $node->node_address));
+            $month_flow = $this->bytesToSize($this->getThisMonthFlow($port, $node->node_address));
+            array_push($array, [
+                'qr_url' => $qr_url,
+                'total' => $total,
+                'day_flow' => $day_flow,
+                'week_flow' => $week_flow,
+                'month_flow' => $month_flow,
+                'node_name' => empty($node->name) ? $node->node_address : $node->name]);
+        }
         return view('user_detail', array(
             'user' => $user,
-            'qr_url' => $qr_url,
-            'total' => $total,
-            'day_flow' => $day_flow,
-            'week_flow' => $week_flow,
-            'month_flow' => $month_flow,
+            'node_data' => $array,
+            'nodes' => $nodes,
         ));
     }
 
-    private function getThisDayFlow($port)
+    private function getThisDayFlow($port, $node)
     {
         //获取当前开始的时刻和最后的时刻
         $startTime = date('Y-m-d 00:00:00', time());
         $endTime = date('Y-m-d 23:59:59', time());
-        return Flow::getFlowFromStartToEnd($port, $startTime, $endTime);
+        return Flow::getFlowFromStartToEnd($port, $node, $startTime, $endTime);
     }
 
-    private function getThisWeekFlow($port)
+    private function getThisWeekFlow($port, $node)
     {
         //获取一周的第一天和最后一天
         $date = new \DateTime();
@@ -139,15 +148,15 @@ class HomeController extends Controller
         $first_day_of_week = $date->format('Y-m-d 00:00:00');
         $date->modify('this week +6 days');
         $end_day_of_week = $date->format('Y-m-d 23:59:59');
-        return Flow::getFlowFromStartToEnd($port, $first_day_of_week, $end_day_of_week);
+        return Flow::getFlowFromStartToEnd($port, $node, $first_day_of_week, $end_day_of_week);
     }
 
-    private function getThisMonthFlow($port)
+    private function getThisMonthFlow($port, $node)
     {
         //获取当月第一天和最后一天
         $first_date = date('Y-m-01 00:00:00', strtotime(date("Y-m-d")));
         $last_date = date('Y-m-d 23:59:59', strtotime("$first_date +1 month -1 day"));
-        return Flow::getFlowFromStartToEnd($port, $first_date, $last_date);
+        return Flow::getFlowFromStartToEnd($port, $node, $first_date, $last_date);
     }
 
 
@@ -159,10 +168,11 @@ class HomeController extends Controller
     {
         $port = $request->get('port');
         $distance = $request->get('hour');
+        $node = $request->get('node');
         $startTime = date('Y-m-d H:00:00', time() + $distance);
         $hour = date('H', time() + $distance);
         $endTime = date('Y-m-d H:59:59', time() + $distance);
-        echo json_encode(Flow::getHourFlow($port, $startTime, $endTime, $hour));
+        echo json_encode(Flow::getHourFlow($port, $node, $startTime, $endTime, $hour));
     }
 
     /**
@@ -173,9 +183,10 @@ class HomeController extends Controller
     {
         $distance = $request->get('day');
         $port = $request->get('port');
+        $node = $request->get('node');
         $startTime = date('Y-m-d 00:00:00', time() + $distance);
         $endTime = date('Y-m-d 23:59:59', time() + $distance);
-        echo json_encode(Flow::getDayFlow($port, $startTime, $endTime));
+        echo json_encode(Flow::getDayFlow($port, $node, $startTime, $endTime));
     }
 
     /**
@@ -186,6 +197,7 @@ class HomeController extends Controller
     {
         $distance = $request->get('week');
         $port = $request->get('port');
+        $node = $request->get('node');
         //本周的第一天和最后一天
         $date = new \DateTime();
         $date->modify('this week');
@@ -195,7 +207,7 @@ class HomeController extends Controller
         //退或前进到某一周的第一天和最后一天
         $startTime = date('Y-m-d 00:00:00', strtotime($first_day_of_week) + $distance);
         $endTime = date('Y-m-d 23:59:59', strtotime($end_day_of_week) + $distance);
-        echo json_encode(Flow::getWeekFlow($port, $startTime, $endTime));
+        echo json_encode(Flow::getWeekFlow($port, $node, $startTime, $endTime));
     }
 
     /**
@@ -293,23 +305,25 @@ class HomeController extends Controller
     public function deletePortFromSSServer($port)
     {
         error_reporting(E_ALL);
-        $service_port = 6001;
-        $address = '127.0.0.1';
+        $nodes = Node::orderBy('id', 'desc')->get();
+        foreach ($nodes as $node) {
+            $service_port = $node->node_port;
+            $address = $node->node_address;
 
-        $client = new \swoole_client(SWOOLE_SOCK_UDP);
-        if (!$client->connect($address, $service_port, -1)) {
-            $result['code'] = 1;
-            $result['msg'] = '删除用户失败，从服务器移除端口失败';
-            echo json_encode($result);
-            return;
+            $client = new \swoole_client(SWOOLE_SOCK_UDP);
+            if (!$client->connect($address, $service_port, -1)) {
+                $result['code'] = 1;
+                $result['msg'] = '删除用户失败，从服务器移除端口失败';
+                return $result;
+            }
+            $attr = array(
+                'server_port' => (int)$port
+            );
+            $jsonAttr = 'remove:' . json_encode($attr);
+            $client->send($jsonAttr);
+            $result = $client->recv();
+            $client->close();
         }
-        $attr = array(
-            'server_port' => (int)$port
-        );
-        $jsonAttr = 'remove:' . json_encode($attr);
-        $client->send($jsonAttr);
-        $result = $client->recv();
-        $client->close();
         return $result;
     }
 

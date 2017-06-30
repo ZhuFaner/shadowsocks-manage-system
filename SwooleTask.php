@@ -12,12 +12,50 @@ $interval_time = $config->interval_time; //向SSServer添加端口号的间隔�
 
 //全局存储器，以防数据库故障
 $saver = array();
+date_default_timezone_set('PRC');
 
-function swooleConnect($node_address, $node_port)
+//接受流量
+function swooleRecieve($node_address, $node_port)
 {
   global $dsn,$db_user,$db_password;
   $client = new swoole_client(SWOOLE_SOCK_UDP, SWOOLE_SOCK_ASYNC);
   $client->on("connect", function(swoole_client $cli) use($dsn,$db_user,$db_password){
+    $cli->send('ok');
+  });
+  $client->on("receive", function(swoole_client $cli, $data) use($node_address){
+      echo "Receive: $data, Address: $node_address\n";
+      // updateData($node_address, $data);
+      sleep(1);
+  });
+  $client->on("error", function(swoole_client $cli){
+      echo "error\n";
+      throw new Exception("Error Processing Request", 1); 
+  });
+  $client->on("close", function(swoole_client $cli){
+      echo "Connection close\n";
+      throw new Exception("Recieve Connection Close", 1); 
+  });
+  swoole_async_dns_lookup($node_address, function($host, $ip) use($client, $node_port){
+      echo "{$host} : {$ip} : $node_port\n";
+      $client->connect($ip, $node_port); 
+  });
+}
+
+//发送端口
+/**
+* 
+*/
+class G
+{
+  public static $lastSwooleCli = [];
+}
+function swooleConnect($node_address, $node_port)
+{
+
+  global $dsn,$db_user,$db_password;
+  $client = new swoole_client(SWOOLE_SOCK_UDP, SWOOLE_SOCK_ASYNC);
+  $client->on("connect", function(swoole_client $cli) use($dsn,$db_user,$db_password){
+    array_push(G::$lastSwooleCli, $cli);
     try {
       $db = new PDO($dsn,$db_user,$db_password);
       $sql = 'select * from members';
@@ -25,7 +63,6 @@ function swooleConnect($node_address, $node_port)
       $query->setfetchmode(pdo::FETCH_ASSOC); //设置数组关联方式
       $result = $query->fetchAll();
       $db = null;
-      // mysql_close($con);
       if(!empty($result)){
               foreach($result as $array){
                   $attr = array(
@@ -37,22 +74,29 @@ function swooleConnect($node_address, $node_port)
               }
           }
     } catch (Exception $e) {
-        echo "数据库连接失败\n";
-      }
+      echo date('Y-m-d H:i:s',time()).': ';
+      echo "数据库连接失败\n";
+    }
   });
   $client->on("receive", function(swoole_client $cli, $data) use($node_address){
-      echo "Receive: $data, Address: $node_address\n";
-      updateData($node_address, $data);
-      sleep(1);
+      // if ($data == 'ok'){
+        // $cli->close();
+      // }
+    echo date('Y-m-d H:i:s',time()).': ';
+    echo "Receive: $data, Address: $node_address\n";
+    updateData($node_address, $data);
+    sleep(1);
   });
   $client->on("error", function(swoole_client $cli){
-      echo "error\n";
+    echo date('Y-m-d H:i:s',time()).': ';
+    echo "error\n";
   });
-  $client->on("close", function(swoole_client $cli){
-      echo "Connection close\n";
+  $client->on("close", function(swoole_client $cli) use($node_address){
+    echo date('Y-m-d H:i:s',time()).': ';  
+    echo "Close: $node_address Connection\n";
   });
+
   swoole_async_dns_lookup($node_address, function($host, $ip) use($client, $node_port){
-      echo "{$host} : {$ip} : $node_port\n";
       $client->connect($ip, $node_port); 
   });
 }
@@ -60,23 +104,30 @@ function swooleConnect($node_address, $node_port)
 
 //每50秒遍历一遍数据库，把所有端口都添加到ssserver中,从第50秒开始
 swoole_timer_tick($interval_time,function() use($dsn,$db_user,$db_password){
-
+  if (G::$lastSwooleCli){
+    foreach (G::$lastSwooleCli as $cli) {
+      $cli->close();
+    }
+    G::$lastSwooleCli = [];
+  }
   try {
     $db = new PDO($dsn, $db_user, $db_password);
-    $sql = 'select node_address, node_port from nodes';
+    $sql = 'select node_address, node_port from nodes where valid=1';
     $query = $db->query($sql);
     $query->setfetchmode(pdo::FETCH_ASSOC); //设置数组关联方式
     $result = $query->fetchAll();
+    $db = null;
     if (!empty($result)){
       foreach ($result as $node) {
         swooleConnect($node['node_address'], $node['node_port']);
       }
     }
-    $db = null;
   } catch (Exception $e) {
+    echo date('Y-m-d H:i:s',time()).': ';
     echo $e;
   }
 });
+
 
     /**
     * 更新端口号的数据流量
@@ -109,14 +160,18 @@ function updateData($node_address, $json){
       date_default_timezone_set('PRC');
       $currentTime = "'".date('Y-m-d H:i:s',time())."'";
 			//向数据库中记录一条流量
-      $sql = 'SELECT * From flows WHERE (id = (SELECT max(id) FROM flows)) AND address = '."'$node_address'";
+      $sql = "SELECT * From flows WHERE address = '$node_address' AND port = $key ORDER BY id";
       $query = $db->query($sql);
       $query->setfetchmode(PDO::FETCH_ASSOC);
-      $result = $query->fetch();
+      $array = $query->fetchAll();
+      $result = array_pop($array);
       if ($result){
-        if ($result["flow"] < 20*1024*1024){
+
+        // if ($result["flow"] < 20*1024*1024){
+        if (time()-$result['time'] < 60*10) {
           $flowResult = $result["flow"]+$value;
-          $db->exec('update flows set flow = '.$flowResult.' where id = '.$result['id']);
+          $sql = "update flows set flow = $flowResult, date_time = $currentTime where id = ".$result['id'];
+          $db->exec($sql);
         }else{
           $values = "'$node_address'".','.$key.','.time().','.$currentTime.','.$value;
           $sqlFlow = 'insert into flows(address,port,time,date_time,flow) values('.$values.')';

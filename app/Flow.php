@@ -14,22 +14,34 @@ class Flow extends Model
      * @param $endTime
      * @return mixed
      */
-    public static function getFlowFromStartToEnd($port, $startTime, $endTime){
-        $flow = DB::table('flows')->where([
-            ['port', '=', $port],
-            ['date_time', '>=', $startTime],
-            ['date_time', '<=', $endTime]
-        ])->sum('flow');
-        return $flow;
-    }
-
-    public static function getAllFlowRank($startTime, $endTime){
-        $flow = DB::table('flows')
-            ->select('port', DB::raw('SUM(flow) as flow'))
-            ->where([
+    public static function getFlowFromStartToEnd($port, $node=null, $startTime, $endTime){
+        if ($node) {
+            $flow = DB::table('flows')->where([
+                ['port', '=', $port],
                 ['date_time', '>=', $startTime],
                 ['date_time', '<=', $endTime]
-            ])
+            ])->where('address',$node)->sum('flow');
+            return $flow;
+        }else{
+            $flow = DB::table('flows')->where([
+                ['port', '=', $port],
+                ['date_time', '>=', $startTime],
+                ['date_time', '<=', $endTime]
+            ])->sum('flow');
+            return $flow;
+        }
+        
+    }
+
+    public static function getAllFlowRank($startTime, $endTime, $node=null){
+        if ($node) {
+            $query = [['date_time', '>=', $startTime],['date_time', '<=', $endTime],['address', $node]];
+        }else{
+            $query = [['date_time', '>=', $startTime],['date_time', '<=', $endTime]];
+        }
+        $flow = DB::table('flows')
+            ->select('port', DB::raw('SUM(flow) as flow'))
+            ->where($query)
             ->groupBy('port')
             ->get();
         return $flow;
@@ -40,20 +52,32 @@ class Flow extends Model
      * @param $port
      * @return mixed
      */
-    public static function getTotalFlow($port){
-        $flow = DB::table('flows')->where('port',$port)->sum('flow');
-        return $flow;
+    public static function getTotalFlow($port, $node=null){
+        if ($node == null) {
+            return DB::table('flows')->where('port',$port)->sum('flow');
+        }else{
+            return DB::table('flows')->where('port',$port)->where('address', $node)->sum('flow');
+        }
     }
 
-    public static function getHourFlow($port,$startTime,$endTime,$hour){
+    public static function getHourFlow($port, $node=null,$startTime,$endTime,$hour){
         $arrayHourFlow = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         $startSec = strtotime($startTime);
         $oneSchedule = 300;
-        $queryArray = DB::table('flows')->where([
-            ['port', '=', $port],
-            ['date_time', '>=', $startTime],
-            ['date_time', '<=', $endTime]
-        ])->get();
+        if ($node) {
+            $queryArray = DB::table('flows')->where([
+                ['port', '=', $port],
+                ['date_time', '>=', $startTime],
+                ['date_time', '<=', $endTime],
+                ['address', $node]
+            ])->get();    
+        }else{
+            $queryArray = DB::table('flows')->where([
+                ['port', '=', $port],
+                ['date_time', '>=', $startTime],
+                ['date_time', '<=', $endTime]
+            ])->get();
+        }
         if (!empty($queryArray)) {
             foreach ($queryArray as $item) {
                 if ($item->time < $startSec + $oneSchedule) {
@@ -114,15 +138,24 @@ class Flow extends Model
         return $result;
     }
 
-    public static function getDayFlow($port,$startTime,$endTime){
+    public static function getDayFlow($port, $node=null,$startTime,$endTime){
         $arrayDayFlow = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         $startSec = strtotime($startTime);
         $oneHourSec = 3600;
-        $queryArray = DB::table('flows')->where([
-            ['port', '=', $port],
-            ['date_time', '>=', $startTime],
-            ['date_time', '<=', $endTime]
-        ])->get();
+        if ($node) {
+            $queryArray = DB::table('flows')->where([
+                ['port', '=', $port],
+                ['date_time', '>=', $startTime],
+                ['date_time', '<=', $endTime],
+                ['address', $node]
+            ])->get();    
+        }else{
+            $queryArray = DB::table('flows')->where([
+                ['port', '=', $port],
+                ['date_time', '>=', $startTime],
+                ['date_time', '<=', $endTime]
+            ])->get();
+        }
         if (!empty($queryArray)) {
             foreach ($queryArray as $item) {
                 if ($item->time < $startSec + $oneHourSec) {
@@ -237,15 +270,24 @@ class Flow extends Model
         return $result;
     }
 
-    public static function getWeekFlow($port,$startTime,$endTime){
+    public static function getWeekFlow($port, $node=null,$startTime,$endTime){
         $arrayWeekFlow = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         $startSec = strtotime($startTime);
         $oneSchedule = 86400;
-        $queryArray = DB::table('flows')->where([
-            ['port', '=', $port],
-            ['date_time', '>=', $startTime],
-            ['date_time', '<=', $endTime]
-        ])->get();
+        if ($node) {
+            $queryArray = DB::table('flows')->where([
+                ['port', '=', $port],
+                ['date_time', '>=', $startTime],
+                ['date_time', '<=', $endTime],
+                ['address', $node]
+            ])->get();    
+        }else{
+            $queryArray = DB::table('flows')->where([
+                ['port', '=', $port],
+                ['date_time', '>=', $startTime],
+                ['date_time', '<=', $endTime]
+            ])->get();
+        }
         if (!empty($queryArray)) {
             foreach ($queryArray as $item) {
                 if ($item->time < $startSec + $oneSchedule) {
