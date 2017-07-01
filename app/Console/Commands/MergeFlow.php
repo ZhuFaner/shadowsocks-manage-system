@@ -13,7 +13,7 @@ class MergeFlow extends Command
      *
      * @var string
      */
-    protected $signature = 'merge:flow';
+    protected $signature = 'flow:merge';
 
     /**
      * The console command description.
@@ -40,7 +40,7 @@ class MergeFlow extends Command
     public function handle()
     {
 
-        $start = mktime(18, 30, 0, 11, 02, 2016);
+        $start = mktime(15, 30, 0, 11, 02, 2016);
         // $end = mktime(19, 30, 0, 11, 02, 2016);
         $end = time();
         while ($start < $end) {
