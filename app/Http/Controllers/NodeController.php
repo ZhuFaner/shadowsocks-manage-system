@@ -16,7 +16,7 @@ class NodeController extends Controller
   }
     public function index()
     {
-      $nodeArray = Node::allNodes(true);
+      $nodeArray = Node::allNodes();
       return view('node_manage')->with('nodeArray', $nodeArray);
     }
 
@@ -40,20 +40,11 @@ class NodeController extends Controller
       $node_port = $request->get('port');
       $exist_node = Node::Where('node_address', $node_address)->first(); 
       if ($exist_node) {
-        if ($exist_node->valid) {
-          $array['msg'] = '请勿添加相同节点';
-          $array['code'] = 1;
-        }else{
-          $exist_node->name = $node_name;
-          $exist_node->node_address = $node_address;
-          $exist_node->node_port = $node_port;
-          $exist_node->valid = true;
-          $exist_node->save();
-          $array['msg'] = '添加成功';  
-        }
+        $array['msg'] = '请勿添加相同节点';
+        $array['code'] = 1;
       }else{
         $array['msg'] = '添加成功';
-        Node::create(['name' => $node_name,'node_address' => $node_address,'node_port' => $node_port, 'valid' => 1]);
+        Node::create(['name' => $node_name,'node_address' => $node_address,'node_port' => $node_port]);
       }
       return $array;
     }
@@ -69,7 +60,7 @@ class NodeController extends Controller
       $array = array(
             'code' => 0,
             'msg' => '保存成功');
-      if (Node::where('node_address', $request->get('address'))->where('id','!=',$id)->where('valid', 1)->first()) {
+      if (Node::where('node_address', $request->get('address'))->where('id','!=',$id)->first()) {
         $array = array(
             'code' => 1,
             'msg' => '请勿添加相同节点');
@@ -85,9 +76,7 @@ class NodeController extends Controller
 
     public function delete($id)
     {
-      $node = Node::find($id);
-      $node->valid = 0;
-      $node->save();
+      Node::destroy($id);
       $array = array(
             'code' => 0,
             'msg' => '删除成功');

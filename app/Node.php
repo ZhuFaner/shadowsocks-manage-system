@@ -8,13 +8,9 @@ class Node extends Model
 {
   protected $fillable = ['name','node_address','node_port', 'valid'];
 
-  public static function allNodes($valid = true)
+  public static function allNodes()
   { 
-    if ($valid) {
-      return Node::orderBy('id', 'desc')->where('valid', true)->get();  
-    }else{
-      return Node::orderBy('id', 'desc')->get();
-    }
+    return Node::orderBy('id', 'desc')->get();
   }
 
   public static function first()

@@ -112,7 +112,7 @@ swoole_timer_tick($interval_time,function() use($dsn,$db_user,$db_password){
   }
   try {
     $db = new PDO($dsn, $db_user, $db_password);
-    $sql = 'select node_address, node_port from nodes where valid=1';
+    $sql = 'select node_address, node_port from nodes';
     $query = $db->query($sql);
     $query->setfetchmode(pdo::FETCH_ASSOC); //设置数组关联方式
     $result = $query->fetchAll();

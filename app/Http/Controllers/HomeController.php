@@ -108,7 +108,7 @@ class HomeController extends Controller
     {
         $port = $request->get('port');
         $user = Member::where('port', $port)->first();
-        $nodes = Node::allNodes(false);
+        $nodes = Node::allNodes();
         $array = [];
         foreach ($nodes as $node) {
             $temp = 'aes-256-cfb:' . $user->password .'@'. $node->node_address . ':'. $user->port;
