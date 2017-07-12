@@ -16,19 +16,19 @@
                             
                             @foreach ($node_data as $data)
                                 <div class="col-md-4">
-                                    <div>服务器：<label>{{ $data["node_name"] }}</label></div>
-                                    <div>本&nbsp;&nbsp;&nbsp;日：<label>{{ $data["day_flow"] }}</label></div>
-                                    <div>本&nbsp;&nbsp;&nbsp;周：<label>{{ $data["week_flow"] }}</label></div>
-                                    <div>本&nbsp;&nbsp;&nbsp;月：<label>{{ $data["month_flow"] }}</label></div>
-                                    <div>总流量：<label>{{ $data["total"] }}</label></div>    
-                                    <div>
-                                        <qr-code data="{{ $data['qr_url'] }}"></qr-code>
+                                    <div style="border-style: solid; border-width: 1px; border-color: lightGray; padding-top: 10px;">
+                                        <div class="col-md-12">服务器：<label>{{ $data["node_name"] }}</label></div>
+                                        <div class="col-md-12">本&nbsp;&nbsp;&nbsp;日：<label>{{ $data["day_flow"] }}</label></div>
+                                        <div class="col-md-12">本&nbsp;&nbsp;&nbsp;周：<label>{{ $data["week_flow"] }}</label></div>
+                                        <div class="col-md-12">本&nbsp;&nbsp;&nbsp;月：<label>{{ $data["month_flow"] }}</label></div>
+                                        <div class="col-md-12">流量：<label>{{ $data["total"] }}</label></div>
+                                        <div>
+                                            <qr-code data="{{ $data['qr_url'] }}"></qr-code>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
-                            
-                            <br>
-                            
+                            <div class="col-md-10" style="margin-top: 10px; font-size: 16px;">总流量：<label>{{ $total }}</label></div>
                         </div>
                     </div>
                 </div>

@@ -11,35 +11,7 @@ $db_password = $config->db_password; //登录数据库的密码
 $interval_time = $config->interval_time; //向SSServer添加端口号的间隔时间
 
 //全局存储器，以防数据库故障
-$saver = array();
 date_default_timezone_set('PRC');
-
-//接受流量
-function swooleRecieve($node_address, $node_port)
-{
-  global $dsn,$db_user,$db_password;
-  $client = new swoole_client(SWOOLE_SOCK_UDP, SWOOLE_SOCK_ASYNC);
-  $client->on("connect", function(swoole_client $cli) use($dsn,$db_user,$db_password){
-    $cli->send('ok');
-  });
-  $client->on("receive", function(swoole_client $cli, $data) use($node_address){
-      echo "Receive: $data, Address: $node_address\n";
-      // updateData($node_address, $data);
-      sleep(1);
-  });
-  $client->on("error", function(swoole_client $cli){
-      echo "error\n";
-      throw new Exception("Error Processing Request", 1); 
-  });
-  $client->on("close", function(swoole_client $cli){
-      echo "Connection close\n";
-      throw new Exception("Recieve Connection Close", 1); 
-  });
-  swoole_async_dns_lookup($node_address, function($host, $ip) use($client, $node_port){
-      echo "{$host} : {$ip} : $node_port\n";
-      $client->connect($ip, $node_port); 
-  });
-}
 
 //发送端口
 /**
@@ -117,7 +89,7 @@ swoole_timer_tick($interval_time,function() use($dsn,$db_user,$db_password){
     $query->setfetchmode(pdo::FETCH_ASSOC); //设置数组关联方式
     $result = $query->fetchAll();
     $db = null;
-    if (!empty($result)){
+    if ($result){
       foreach ($result as $node) {
         swooleConnect($node['node_address'], $node['node_port']);
       }
@@ -133,7 +105,7 @@ swoole_timer_tick($interval_time,function() use($dsn,$db_user,$db_password){
     * 更新端口号的数据流量
     */
 function updateData($node_address, $json){
-  global $saver, $dsn,$db_user,$db_password;
+  global $dsn,$db_user,$db_password;
   
   echo json_decode($json);
 	$stat = 'stat: ';
@@ -145,12 +117,9 @@ function updateData($node_address, $json){
   	$db = new PDO($dsn,$db_user,$db_password);
   } catch (Exception $e) {
     echo "插入数据库连接失败\n$json\n";
-    array_push($saver, json_decode($json));
-    echo count($saver)."条数据暂存\n";
     return;
   }
 
-  cleanGlobalSaver();
 	$array = json_decode($json);
 	if(empty($array)){
 		return;
@@ -207,30 +176,4 @@ function updateData($node_address, $json){
 		
 	};
 	$db = null;
-}
-
-//清空未入库的数据
-function cleanGlobalSaver()
-{
-  global $dsn,$db_user,$db_password,$saver;
-  if (empty($saver)) {
-    return;
-  }
-  $count = count($saver);
-  foreach ($saver as $index => $dict) {
-    foreach ($dict as $key => $value) {
-      try {
-        date_default_timezone_set('PRC');
-        $currentTime = "'".date('Y-m-d H:i:s',time())."'";
-        $values = $key.','.time().','.$currentTime.','.$value;
-        $sqlFlow = 'insert into flows(port,time,date_time,flow) values('.$values.')';
-        $db = new PDO($dsn,$db_user,$db_password);
-        $db->exec($sqlFlow);
-        unset($saver[$index]);
-        $db = null;
-      } catch (Exception $e) {
-      }
-    }
-  }
-  echo "清空未入库数据:"."($count) 条\n";
 }

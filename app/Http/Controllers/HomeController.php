@@ -129,6 +129,7 @@ class HomeController extends Controller
             'user' => $user,
             'node_data' => $array,
             'nodes' => $nodes,
+            'total' => $this->bytesToSize(Flow::getTotalFlow($port)),
         ));
     }
 
