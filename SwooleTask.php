@@ -57,7 +57,7 @@ function swooleConnect($node_address, $node_port)
     echo date('Y-m-d H:i:s',time()).': ';
     echo "Receive: $data, Address: $node_address\n";
     updateData($node_address, $data);
-    sleep(1);
+    // sleep(1);
   });
   $client->on("error", function(swoole_client $cli){
     echo date('Y-m-d H:i:s',time()).': ';
