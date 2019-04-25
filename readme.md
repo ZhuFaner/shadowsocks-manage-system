@@ -88,7 +88,7 @@ php artisan migrate
 ① Ubuntu
 
 ```bash
-sudo apt install python-pip
+sudo apt-get install python-pip
 pip install git+https://github.com/shadowsocks/shadowsocks.git@master
 ```
 
@@ -138,7 +138,7 @@ sudo yum install php-pear pecl
 Ubuntu 系统：
 
 ```bash
-sudo apt install php-pear php-dev
+sudo apt-get install php-pear php-dev
 ```
 
 然后使用 pecl 安装 swoole：
